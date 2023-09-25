@@ -2,6 +2,7 @@ import { Box, Button } from "@mui/material";
 import { ProviderRpcClient, Address } from "everscale-inpage-provider";
 import { useEffect, useState } from "react";
 import Tip3TokenTransfer from "./Tip3TokenTransfer";
+import { connect } from "http2";
 
 const EverwalletPage = () => {
   const [addressSender, setAddressSender] = useState<Address>();
@@ -67,8 +68,9 @@ const EverwalletPage = () => {
 
   return (
     <Box>
-      <Button onClick={handleDepositClick}>Deploy</Button>
+      <Button onClick={handleDepositClick}>Transfer</Button>
       <Button onClick={disconnect}>Disconnect</Button>
+      <Button onClick={connectEverwallet}>Connect</Button>
     </Box>
   );
 };

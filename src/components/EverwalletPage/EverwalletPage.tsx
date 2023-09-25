@@ -60,12 +60,15 @@ const EverwalletPage = () => {
           addressRecipient,
         });
       }
-    } catch {}
+    } catch(err) {
+      console.log(err, 'err')
+    }
   };
 
   return (
     <Box>
       <Button onClick={handleDepositClick}>Deploy</Button>
+      <Button onClick={disconnect}>Disconnect</Button>
     </Box>
   );
 };

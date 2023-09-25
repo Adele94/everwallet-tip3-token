@@ -15,6 +15,35 @@ type ITip3TokenTransfer = {
   addressRecipient: Address;
 };
 
+const getTokenBalance = async (token: any, walletAdd: Address, provider: ProviderRpcClient) => {
+  try {
+    const tokenRoot = new provider.Contract(
+      TokenRootAbi,
+      new Address(token.address)
+    );
+    const { value0: walletAddress } = await tokenRoot.methods
+      .walletOf({
+        answerId: 0,
+        walletOwner: walletAdd
+      })
+      .call();
+
+    const tokenWallet = new provider.Contract(
+      TokenWalletAbi,
+      walletAddress
+    );
+
+    const { value0: balance } = await tokenWallet.methods
+      .balance({ answerId: 0 })
+      .call();
+
+    return new BigNumber(balance).shiftedBy(-token.decimals);
+  } catch {
+    return new BigNumber(0);
+  }
+}
+
+
 async function Tip3TokenTransfer({
   provider,
   amountToken,
@@ -28,6 +57,13 @@ async function Tip3TokenTransfer({
 
   // address of TIP3-TOKEN
   // https://everscan.io/accounts/TIP3_TOKEN_ROOT_ADDRESS
+
+  const userBalance = await getTokenBalance({
+    address: TIP3_TOKEN_ROOT_ADDRESS,
+    decimals: 18
+  }, addressSender, provider)
+
+  console.log(userBalance.toString(), 'userBalance')
 
   const getWalletAddress = async (owner: Address, root: Address, state?: FullContractState) => {
     const rootContract = new provider.Contract(TokenRootAbi, root);
@@ -58,7 +94,7 @@ async function Tip3TokenTransfer({
     })
     .sendDelayed({
       //amount: (amountToken * 10 ** 9).toString(),
-      amount: new BigNumber(1500000000).plus('1500000000').toFixed(),
+      amount: new BigNumber(100000).toFixed(),
       bounce: true,
       from: addressSender,
     });

@@ -1,7 +1,8 @@
 import { Address, FullContractState, ProviderRpcClient } from 'everscale-inpage-provider';
 import BigNumber from 'bignumber.js';
 
-import { TokenAbi } from './abi/token.abi';
+import {TokenRootAbi} from './abi/token.abi';
+import {TokenWalletAbi} from './abi/token-wallet';
 
 export function toCoin(amount: number) {
   return new BigNumber(amount).shiftedBy(9).toFixed();
@@ -21,7 +22,7 @@ async function Tip3TokenTransfer({
   addressRecipient,
 }: ITip3TokenTransfer) {
 
-  const TIP3_TOKEN_ROOT_ADDRESS = '0:9f20666ce123602fd7a995508aeaa0ece4f92133503c0dfbd609b3239f3901e2';
+  const TIP3_TOKEN_ROOT_ADDRESS = '0:7e23c204a0f7a420aa998fd6d2d2fa849da0758114519e53b1105dc66807d33a';
 
   if (!addressSender || !provider || !amountToken || !addressRecipient) return;
 
@@ -29,21 +30,22 @@ async function Tip3TokenTransfer({
   // https://everscan.io/accounts/TIP3_TOKEN_ROOT_ADDRESS
 
   const getWalletAddress = async (owner: Address, root: Address, state?: FullContractState) => {
-    const rootContract = new provider.Contract(TokenAbi.Root, root);
+    const rootContract = new provider.Contract(TokenRootAbi, root);
+    console.log(owner, 'owner')
     const tokenWallet = (
       await rootContract.methods
         .walletOf({
           answerId: 0,
           walletOwner: owner,
         })
-        .call({ cachedState: state })
+        .call({ responsible: true })
     ).value0;
     return tokenWallet;
   };
 
   const walletAddress = await getWalletAddress(addressSender, new Address(TIP3_TOKEN_ROOT_ADDRESS));
 
-  const tokenWallet = new provider.Contract(TokenAbi.Wallet, walletAddress);
+  const tokenWallet = new provider.Contract(TokenWalletAbi, walletAddress);
 
   const message = await tokenWallet.methods
     .transfer({

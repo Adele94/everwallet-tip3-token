@@ -85,7 +85,7 @@ async function Tip3TokenTransfer({
 
   const message = await tokenWallet.methods
     .transfer({
-      amount: (amountToken * 10 ** 9).toString(),
+      amount: (amountToken * 10 ** 18).toString(),
       deployWalletValue: '0',
       notify: true,
       payload: '',
@@ -94,7 +94,7 @@ async function Tip3TokenTransfer({
     })
     .sendDelayed({
       //amount: (amountToken * 10 ** 9).toString(),
-      amount: new BigNumber(100000).toFixed(),
+      amount: '500000000',
       bounce: true,
       from: addressSender,
     });

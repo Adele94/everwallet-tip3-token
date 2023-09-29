@@ -48,9 +48,9 @@ const EverwalletPage = () => {
   const handleDepositClick = async () => {
     try {
       await connectEverwallet();
-      const amountToken = 0.05;
+      const amountToken = 0.02;
       const addressRecipient = new Address(
-        "0:8317ae7ee92d748500e179843b587d7fbd98d6bb37402e2b44566f9f6f3cdd90"
+        "0:21b9bc5aeeed9ec0a3e9d350582e024322e77d2ccb90c6c38df35dd7dd6dfd26"
       );
       
       if (provider && addressSender && addressRecipient) {

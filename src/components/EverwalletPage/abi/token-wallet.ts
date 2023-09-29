@@ -74,13 +74,6 @@ export const TokenWalletAbi = {
       outputs: []
     },
     {
-      name: "buildTransferPayload",
-      inputs: [
-        { name: "user_id", type: "string" }
-      ],
-      outputs: [{ name: "transferPayload", type: "cell" }]
-    },
-    {
       name: "transferToWallet",
       inputs: [
         { name: "amount", type: "uint128" },

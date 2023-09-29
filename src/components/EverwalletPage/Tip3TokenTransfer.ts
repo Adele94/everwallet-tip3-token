@@ -2,11 +2,11 @@ import {
   Address,
   FullContractState,
   ProviderRpcClient,
-} from 'everscale-inpage-provider';
-import BigNumber from 'bignumber.js';
+} from "everscale-inpage-provider";
+import BigNumber from "bignumber.js";
 
-import { TokenRootAbi } from './abi/token.abi';
-import { TokenWalletAbi } from './abi/token-wallet';
+import { TokenRootAbi } from "./abi/token.abi";
+import { TokenWalletAbi } from "./abi/token-wallet";
 
 export function toCoin(amount: number) {
   return new BigNumber(amount).shiftedBy(9).toFixed();
@@ -55,7 +55,7 @@ async function Tip3TokenTransfer({
   addressRecipient,
 }: ITip3TokenTransfer) {
   const TIP3_TOKEN_ROOT_ADDRESS =
-    '0:7e23c204a0f7a420aa998fd6d2d2fa849da0758114519e53b1105dc66807d33a';
+    "0:7e23c204a0f7a420aa998fd6d2d2fa849da0758114519e53b1105dc66807d33a";
 
   if (!addressSender || !provider || !amountToken || !addressRecipient) return;
 
@@ -71,7 +71,7 @@ async function Tip3TokenTransfer({
     provider
   );
 
-  console.log(userBalance.toString(), 'userBalance');
+  console.log(userBalance.toString(), "userBalance");
 
   const getWalletAddress = async (
     owner: Address,
@@ -79,7 +79,7 @@ async function Tip3TokenTransfer({
     state?: FullContractState
   ) => {
     const rootContract = new provider.Contract(TokenRootAbi, root);
-    console.log(owner, 'owner');
+    console.log(owner, "owner");
     const tokenWallet = (
       await rootContract.methods
         .walletOf({
@@ -97,19 +97,33 @@ async function Tip3TokenTransfer({
   );
 
   const tokenWallet = new provider.Contract(TokenWalletAbi, walletAddress);
+
+  const userId = "7683def8-bc91-4716-ab8f-03004b188f3f";
+  const payloadMessage = { user_id: userId };
+
+  const result = await provider.packIntoCell({
+    structure: [{ name: "user_id", type: "bytes" } as const] as const,
+    data: {
+      user_id: btoa(JSON.stringify(payloadMessage)),
+    },
+  });
+
+  const unpack = await provider.unpackFromCell({
+    structure: [{ name: "user_id", type: "bytes" } as const] as const,
+    boc: result.boc,
+    allowPartial: false
+  }) ;
   
-  const { transferPayload: payload } = await tokenWallet.methods
-    .buildTransferPayload({
-      user_id: '7683def8-bc91-4716-ab8f-03004b188f3f',
-    })
-    .call();
+  console.log(result.boc);
+  console.log(atob(result.boc));
+  console.log(unpack);
 
   const message = await tokenWallet.methods
     .transfer({
       amount: (amountToken * 10 ** 9).toString(),
-      deployWalletValue: '0',
+      deployWalletValue: "0",
       notify: true,
-      payload: payload,
+      payload: result.boc,
       recipient: addressRecipient,
       remainingGasTo: addressSender,
     })
